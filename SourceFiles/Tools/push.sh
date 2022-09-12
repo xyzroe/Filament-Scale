@@ -28,8 +28,8 @@ function version {
 
     echo "$ver"
 
-    sed "s/[0-9].[0-9].[0-9]/$ver/" ../JmcFilamentScale/version.h > ../JmcFilamentScale/version.h_temp
-    mv ../JmcFilamentScale/version.h_temp ../JmcFilamentScale/version.h
+    sed "s/[0-9].[0-9].[0-9]/$ver/" ../JmcFilamentScale/Version.h > ../JmcFilamentScale/Version.h_temp
+    mv ../JmcFilamentScale/Version.h_temp ../JmcFilamentScale/Version.h
 }
 
 function spaser {
@@ -65,7 +65,7 @@ function push {
     spaser
 }
 
-file="../JmcFilamentScale/version.h" 
+file="../JmcFilamentScale/Version.h" 
 ver=$(echo $(cat "$file") | egrep -o '(\d+\.\d+\.\d+-?\w*)')
 
 echo 'Push script for Filament-Scale Firmware v'$ver
