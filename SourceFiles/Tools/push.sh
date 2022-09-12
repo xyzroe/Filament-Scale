@@ -1,4 +1,5 @@
 #!/bin/bash
+cd "$(dirname "$0")"
 
 function version {
     IFS='.' read -r -a array <<< "$ver"
@@ -59,13 +60,13 @@ function tag {
 
 function push {
     spaser
-    echo 'git push'  
+    echo 'git push'
     git push
     git push origin --tags
     spaser
 }
 
-file="../JmcFilamentScale/Version.h" 
+file="../JmcFilamentScale/Version.h"
 ver=$(echo $(cat "$file") | egrep -o '(\d+\.\d+\.\d+-?\w*)')
 
 echo 'Push script for Filament-Scale Firmware v'$ver
