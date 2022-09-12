@@ -1,4 +1,4 @@
-![image-20211214100756741](C:\Users\JMC\AppData\Roaming\Typora\typora-user-images\image-20211214100756741.png)
+![Main view](https://user-images.githubusercontent.com/6440415/189723142-54c67358-0b6f-462a-8249-15059b5a4bf1.png)
 
 # General
 
