@@ -1,24 +1,21 @@
 #!/usr/bin/env python3
-from subprocess import call
 Import("env")
 import shutil
 import os
-from glob import glob
 
 def after_build(source, target, env):
 
-    firmware_folder = env.subst("$BUILD_DIR").split('/').pop()
-    #print(firmware_folder)
-    NEW_NAME = 'bin/'+firmware_folder+'.bin'
-    shutil.move(firmware_source, NEW_NAME)
-    
-    
-    #for f in glob ('bin/*.bin'):
-    #    os.unlink (f)
+    if not os.path.exists('bin'):
+        os.makedirs('bin')
 
+    firmware_folder = env.subst("$BUILD_DIR").split('/').pop()
+
+    new_file_name = 'bin/'+firmware_folder+'.bin'
+    shutil.move(firmware_source, new_file_name)
+    
     print('')
     print('--------------------------------------------------------')
-    print('{} created with success !'.format(str(NEW_NAME)))
+    print('{} created'.format(str(new_file_name)))
     print('--------------------------------------------------------')
     print('')
 
