@@ -70,7 +70,7 @@
 static const int TFT_CS   = 14;     // TFT display CS pin.
 static const int TFT_DC   = 32;     // TFT display DC pin.
 static const int TFT_RST  = 15;     // TFT display RST pin.
-static const int TFT_LITE = A0;     // TFT display backlight pin.
+static const int TFT_LITE = 26;     // TFT display backlight pin.
 
 // Construct our TFT  object.
 // Adafruit_ST7735 gTft(TFT_CS, TFT_DC, TFT_RST);
@@ -84,8 +84,8 @@ static const char *gTftNvsName       = "Dispaly";
 /////////////////////////////////////////////////////////////////////////////////
 // Rotary encoder pins.
 /////////////////////////////////////////////////////////////////////////////////
-static const int ENC_PIN_A      = A3;   // Encoder A pin.
-static const int ENC_PIN_B      = A4;   // Encoder B pin.
+static const int ENC_PIN_A      = 39;   // Encoder A pin.
+static const int ENC_PIN_B      = 36;   // Encoder B pin.
 static const int ENC_BUTTON_PIN = 13;   // Encoder pushbutton pin.
 static const int ENC_SENSITIVITY = 4;   // Encoder sensitivity.
 
@@ -97,7 +97,7 @@ ESP32EncoderStream gEncStream(ENC_PIN_A, ENC_PIN_B, ENC_BUTTON_PIN, ENC_SENSITIV
 /////////////////////////////////////////////////////////////////////////////////
 // Auxiliary pushbutton pins.
 /////////////////////////////////////////////////////////////////////////////////
-static const int AUX_BUTTON_PIN = A1;   // Auxiliary pushbutton pin.
+static const int AUX_BUTTON_PIN = 25;   // Auxiliary pushbutton pin.
 
 // Construct the auxiliary pushbutton object.
 AuxPb gAuxPb(AUX_BUTTON_PIN);
@@ -106,8 +106,8 @@ AuxPb gAuxPb(AUX_BUTTON_PIN);
 /////////////////////////////////////////////////////////////////////////////////
 // Define the LoadCell sensor related I/O pins and global data and constants.
 /////////////////////////////////////////////////////////////////////////////////
-static const int LOADCELL_DOUT_PIN  = A2;   // LoadCell DOUT signal pin.
-static const int LOADCELL_SCK_PIN   = A5;   // LoadCell CLOCK pin.
+static const int LOADCELL_DOUT_PIN  = 34;   // LoadCell DOUT signal pin.
+static const int LOADCELL_SCK_PIN   = 4;   // LoadCell CLOCK pin.
 
 // Construct and init the LoadCell object.
 LoadCell gLoadCell(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN, 128U);
