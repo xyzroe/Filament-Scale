@@ -40,7 +40,7 @@ function spaser {
 
 function commit {
     spaser
-    echo -e "v$ver\n\n$(cat commit)" > commit_temp
+    echo -e "v$ver\n\n$(cat ../../commit)" > commit_temp
     cat commit_temp
     spaser
     git commit -a --file=commit_temp
