@@ -17,6 +17,10 @@
 #include <WiFiManager.h>        // Manage connection. https://github.com/tzapu/WiFiManager
 #include <WebServer.h>          // For web server handling.
 
+#include <ETH.h>
+
+static bool eth_connected = false;
+static bool eth_found = false;
 
 /////////////////////////////////////////////////////////////////////////////////
 // Network class

@@ -29,6 +29,45 @@ Network::Network(int serverPort) : WebServer(serverPort), m_pName(NULL),
 {
 } // End constructor.
 
+void WiFiEvent(WiFiEvent_t event)
+{
+  switch (event) {
+    case ARDUINO_EVENT_ETH_START:
+      Serial.println("ETH Started");
+      eth_found = true;
+      //set eth hostname here
+      ETH.setHostname("SCALE");
+      break;
+    case ARDUINO_EVENT_ETH_CONNECTED:
+      Serial.println("ETH Connected");
+      eth_found = true;
+      break;
+    case ARDUINO_EVENT_ETH_GOT_IP:
+      Serial.print("ETH MAC: ");
+      Serial.print(ETH.macAddress());
+      Serial.print(", IPv4: ");
+      Serial.print(ETH.localIP());
+      if (ETH.fullDuplex()) {
+        Serial.print(", FULL_DUPLEX");
+      }
+      Serial.print(", ");
+      Serial.print(ETH.linkSpeed());
+      Serial.println("Mbps");
+      eth_connected = true;
+      break;
+    case ARDUINO_EVENT_ETH_DISCONNECTED:
+      Serial.println("ETH Disconnected");
+      eth_connected = false;
+      break;
+    case ARDUINO_EVENT_ETH_STOP:
+      Serial.println("ETH Stopped");
+      eth_connected = false;
+      eth_found = false;
+      break;
+    default:
+      break;
+  }
+}
 
 /////////////////////////////////////////////////////////////////////////////////
 // Init()
@@ -54,48 +93,71 @@ bool Network::Init(const char *pName, const char *pApName = NULL,
     // Assume we're gonna fail.
     bool status = false;
 
-    // Make sure the name is valid.  If not then we fail.
-    if ((pName != NULL) && (*pName != '\0') && (strlen(pName) <= MAX_NVS_NAME_LEN))
-    {
-        // Name was OK.  Save it.
-        m_pName = pName;
+      
+    WiFi.onEvent(WiFiEvent);
+    delay(100);
+    #if ETH_POWER_PIN
+    ETH.begin(ETH_ADDR, ETH_POWER_PIN, ETH_MDC_PIN, ETH_MDIO_PIN, ETH_TYPE, ETH_CLK_MODE);
+    #endif // ETH_POWER_PIN
 
-        // Setup our AP name if one was given.
-        if (pApName != NULL)
-        {
-            MDNS.begin(pApName);
+    unsigned long startTime = millis();
+
+    if (eth_found) {
+        while(millis() < startTime + 10000) 
+        {   
+            if (eth_connected)
+            {
+                MDNS.begin(pServerName);
+                WebServer::begin();
+                return true;
+            }
         }
-
-        // Setup the wifi manager.
-        m_WiFiManager.setCaptivePortalEnable(false);
-        m_WiFiManager.setCleanConnect(true);
-        m_WiFiManager.setShowInfoErase(false);
-        m_WiFiManager.setConfigPortalBlocking(false);
-
-        // Attempt to connect to the network.
-        m_Connected = m_WiFiManager.autoConnect(pApName);
-
-        // If we're connected, then change our network mdns id and start the server.
-        if (m_Connected)
-        {
-            // Use the passed in name for our net name.  Access via
-            // pServerName.local.  For example, if pServerName points to the
-            // following string:
-            //    "MyDevice"
-            // then a browser can find the device via the following:
-            //    "http://MyDevice.local".
-            MDNS.begin(pServerName);
-
-            // Start the web server.
-            WebServer::begin();
-        }
-
-        //  Remember that we succeeded.
-        status = true;
     }
-    return status;
-} // End Init().
+ 
+    if (!eth_connected) {
+        // Make sure the name is valid.  If not then we fail.
+        if ((pName != NULL) && (*pName != '\0') && (strlen(pName) <= MAX_NVS_NAME_LEN))
+        {
+            // Name was OK.  Save it.
+            m_pName = pName;
 
+            // Setup our AP name if one was given.
+            if (pApName != NULL)
+            {
+                MDNS.begin(pApName);
+            }
+
+            // Setup the wifi manager.
+            m_WiFiManager.setCaptivePortalEnable(false);
+            m_WiFiManager.setCleanConnect(true);
+            m_WiFiManager.setShowInfoErase(false);
+            m_WiFiManager.setConfigPortalBlocking(false);
+
+            // Attempt to connect to the network.
+            m_Connected = m_WiFiManager.autoConnect(pApName);
+
+            // If we're connected, then change our network mdns id and start the server.
+            if (m_Connected)
+            {
+                // Use the passed in name for our net name.  Access via
+                // pServerName.local.  For example, if pServerName points to the
+                // following string:
+                //    "MyDevice"
+                // then a browser can find the device via the following:
+                //    "http://MyDevice.local".
+                MDNS.begin(pServerName);
+
+                // Start the web server.
+                WebServer::begin();
+            }
+
+            //  Remember that we succeeded.
+            status = true;
+        }
+        return status;
+    }
+    return false;
+} // End Init().
 
 /////////////////////////////////////////////////////////////////////////////////
 // Process()
@@ -116,26 +178,35 @@ bool Network::Process()
 {
     // If we're not yet connected, then call the wifi manager to see if a
     // connection was recently made.
-    if (!m_Connected)
-    {
-        if (m_WiFiManager.process())
-        {
-            // Just connected which means that we need to reset the network.
-            // This is a kludge, but it is the only way I could get a new
-            // connection to take effect on the ESP32.  Here we delay in order
-            // to allow the wifi manager to complete its NVS save, then we
-            // reset the system.  When we come back up, we should be connected
-            // to the new network.
-            delay(1000);
-            ESP.restart();
-            delay(1000);
-        }
-    }
-    else
+
+    if (eth_found && eth_connected) 
     {
         WebServer::handleClient();
+        return true;
     }
-    return m_Connected;
+    else 
+    {
+        if (!m_Connected)
+        {
+            if (m_WiFiManager.process())
+            {
+                // Just connected which means that we need to reset the network.
+                // This is a kludge, but it is the only way I could get a new
+                // connection to take effect on the ESP32.  Here we delay in order
+                // to allow the wifi manager to complete its NVS save, then we
+                // reset the system.  When we come back up, we should be connected
+                // to the new network.
+                delay(1000);
+                ESP.restart();
+                delay(1000);
+            }
+        }
+        else
+        {
+            WebServer::handleClient();
+        }
+        return m_Connected;
+    }
 }
 
 

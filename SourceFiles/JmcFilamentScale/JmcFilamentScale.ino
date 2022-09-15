@@ -712,7 +712,7 @@ static void InitUnusedPins()
 {
     // List of pins that are unused for this project.
     // !!! This list will need to be updated if the hardware setup changes.
-    int unusedPins[] = {16, 17, 22, 23, 33};
+    int unusedPins[] = {16, 22, 33}; //17, 22, 23,
 
     // Set each unused pin to a pulled down input.
     for (int i = 0; i < sizeof(unusedPins) / sizeof(unusedPins[0]); i++)
@@ -737,7 +737,7 @@ static bool InitObjects()
     bool status = true;
 
     // Initialize the unused HW pins.
-    InitUnusedPins();
+    //InitUnusedPins();
 
     // Initialize the Display class.
     if (!gTft.Init(gTftNvsName) || !MainScreen::Init(gMainScreenNvsName))
@@ -1087,7 +1087,7 @@ void setup()
     {
         Serial.println("InitObjects() failed.");
     }
-
+    
     // Clear any aux pushbutton data.
     gAuxPb.Read();
 
@@ -1103,7 +1103,7 @@ void setup()
 // subsystem or the main display screen.
 /////////////////////////////////////////////////////////////////////////////////
 void loop()
-{
+{   
     // Number of milliseconds to delay at the end of each loop() execution.
     const uint32_t LOOP_DELAY = 2;
 
